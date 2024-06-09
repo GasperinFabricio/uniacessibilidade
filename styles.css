@@ -8,9 +8,16 @@
     justify-content: space-between;
   }
 
-  div {
+  .wrap {
     flex-basis: 100%;
-    height: 100px;
+    height: 50px;
+    margin-bottom: 0.5rem;
+  }
+
+  img {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
     margin-bottom: 0.5rem;
   }
 
@@ -55,4 +62,28 @@
   border-radius: 0 5px 5px 0;
   cursor: pointer;
   font-size: 20px;
+}
+
+.adicionar {
+  border-radius: 50px;
+  border: 1px solid black;
+  background-color: #d9d9d9;
+}
+
+p {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #d9d9d9;
+  border-radius: 5px 5px 5px 5px;
+  height: 70%;
+  align-content: center;
+}
+
+.divAcessivel {
+  width: 110%;
+  height: 50%;
+  text-align: center;
+}
+
+.editing {
+  display: contents;
 }
