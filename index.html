@@ -18,6 +18,13 @@
     #map {
       height: 400px;
     }
+    .custom-cluster-icon {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      border: 1px solid #ccc;
+      text-align: center;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
@@ -56,6 +63,9 @@
   });
   map.addLayer(markers);
 
+  // Unique ID generator for markers
+  var markerId = 0;
+
   // Function to add marker on map click with rating input
   function addMarkerAndCluster(e) {
     var rating = prompt("Enter rating (1-5):");
@@ -66,8 +76,9 @@
       return;
     }
 
-    var newMarker = L.marker(e.latlng, { votes: [rating] }); // Store ratings in an array
-    newMarker.bindPopup("<div id='popup'><b>Waypoint</b><br>Rating: " + rating + "/5<br><button onclick='addVote(this)'>Add Vote</button></div>");
+    markerId++; // Increment marker ID for uniqueness
+    var newMarker = L.marker(e.latlng, { votes: [rating], id: markerId }); // Store ratings in an array
+    newMarker.bindPopup("<div id='popup' data-id='" + markerId + "'><b>Waypoint</b><br>Rating: " + rating + "/5<br><button onclick='addVote(this)'>Add Vote</button></div>");
     markers.addLayer(newMarker);
   }
 
@@ -76,7 +87,8 @@
 
   // Function to add vote when user clicks 'Add Vote' button in the popup
   function addVote(element) {
-    var marker = markers.getLayer(parseInt(element.parentElement.getAttribute('data-id')));
+    var markerId = parseInt(element.parentElement.getAttribute('data-id'));
+    var marker = getMarkerById(markerId);
     var rating = prompt("Enter additional rating (1-5):");
     rating = parseInt(rating);
 
@@ -89,6 +101,17 @@
     updatePopupContent(marker);
   }
 
+  // Function to get marker by ID
+  function getMarkerById(id) {
+    var marker;
+    markers.eachLayer(function(m) {
+      if (m.options.id === id) {
+        marker = m;
+      }
+    });
+    return marker;
+  }
+
   // Function to update popup content with current average rating
   function updatePopupContent(marker) {
     var votes = marker.options.votes;
@@ -97,9 +120,9 @@
       totalRating += votes[i];
     }
     var averageRating = totalRating / votes.length;
-    document.getElementById('popup').innerHTML = "<b>Waypoint</b><br>Rating: " + averageRating.toFixed(1) + "/5<br><button onclick='addVote(this)'>Add Vote</button>";
+    marker.getPopup().setContent("<div id='popup' data-id='" + marker.options.id + "'><b>Waypoint</b><br>Rating: " + averageRating.toFixed(1) + "/5<br><button onclick='addVote(this)'>Add Vote</button></div>");
+    marker.openPopup(); // Reopen the popup to show the updated content
   }
-
 </script>
 
 </body>
