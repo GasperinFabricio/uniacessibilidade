@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leaflet Dynamic Marker Clustering Example</title>
+  <title>Leaflet Dynamic Marker Clustering Example with Interactive Ratings</title>
   <!-- Include Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <!-- Include Leaflet JavaScript -->
@@ -31,33 +31,75 @@
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(map);
 
-
-  var markerData = [
-    {lat: 51.5, lng: -0.09, rating: 4},
-    {lat: 51.51, lng: -0.1, rating: 3},
-    {lat: 51.49, lng: -0.08, rating: 5},
-    {lat: 51.49, lng: -0.08, rating: 1},
-    {lat: 51.49, lng: -0.08, rating: 2},
-    {lat: 51.49, lng: -0.08, rating: 3},
-    {lat: 51.49, lng: -0.08, rating: 1}
-  ];
-
-  var clusters = {};
-  for (var i = 1; i <= 5; i++) {
-    clusters[i] = L.markerClusterGroup();
-  }
-
-  markerData.forEach(function(marker) {
-    var newMarker = L.marker([marker.lat, marker.lng]);
-    newMarker.bindPopup("<b>Place</b><br>Rating: " + marker.rating + "/5");
-    clusters[marker.rating].addLayer(newMarker);
-  });
-
-  for (var key in clusters) {
-    if (clusters.hasOwnProperty(key)) {
-      map.addLayer(clusters[key]);
+  // Initialize MarkerClusterGroup for clustering markers
+  var markers = L.markerClusterGroup({
+    // Customizing cluster icon to show average rating
+    iconCreateFunction: function(cluster) {
+      var childMarkers = cluster.getAllChildMarkers();
+      var totalRating = 0;
+      var totalVotes = 0;
+      for (var i = 0; i < childMarkers.length; i++) {
+        var votes = childMarkers[i].options.votes;
+        for (var j = 0; j < votes.length; j++) {
+          totalRating += votes[j];
+        }
+        totalVotes += votes.length;
+      }
+      var averageRating = totalRating / totalVotes;
+      var roundedAverage = averageRating.toFixed(1); // Round to one decimal place
+      return L.divIcon({
+        html: '<div style="line-height: 1.6;">' + roundedAverage + '<br>Rating</div>',
+        className: 'custom-cluster-icon',
+        iconSize: [40, 40]
+      });
     }
+  });
+  map.addLayer(markers);
+
+  // Function to add marker on map click with rating input
+  function addMarkerAndCluster(e) {
+    var rating = prompt("Enter rating (1-5):");
+    rating = parseInt(rating);
+
+    if (isNaN(rating) || rating < 1 || rating > 5) {
+      alert("Please enter a valid rating between 1 and 5.");
+      return;
+    }
+
+    var newMarker = L.marker(e.latlng, { votes: [rating] }); // Store ratings in an array
+    newMarker.bindPopup("<div id='popup'><b>Waypoint</b><br>Rating: " + rating + "/5<br><button onclick='addVote(this)'>Add Vote</button></div>");
+    markers.addLayer(newMarker);
   }
+
+  // Event listener for map click
+  map.on('click', addMarkerAndCluster);
+
+  // Function to add vote when user clicks 'Add Vote' button in the popup
+  function addVote(element) {
+    var marker = markers.getLayer(parseInt(element.parentElement.getAttribute('data-id')));
+    var rating = prompt("Enter additional rating (1-5):");
+    rating = parseInt(rating);
+
+    if (isNaN(rating) || rating < 1 || rating > 5) {
+      alert("Please enter a valid rating between 1 and 5.");
+      return;
+    }
+
+    marker.options.votes.push(rating);
+    updatePopupContent(marker);
+  }
+
+  // Function to update popup content with current average rating
+  function updatePopupContent(marker) {
+    var votes = marker.options.votes;
+    var totalRating = 0;
+    for (var i = 0; i < votes.length; i++) {
+      totalRating += votes[i];
+    }
+    var averageRating = totalRating / votes.length;
+    document.getElementById('popup').innerHTML = "<b>Waypoint</b><br>Rating: " + averageRating.toFixed(1) + "/5<br><button onclick='addVote(this)'>Add Vote</button>";
+  }
+
 </script>
 
 </body>

@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Leaflet Static Image Marker Clustering Example</title>
-  <!-- Include Leaflet CSS -->
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <!-- Include Leaflet JavaScript -->
+
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <!-- Include Leaflet MarkerCluster CSS -->
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-  <!-- Include Leaflet MarkerCluster JavaScript -->
+
   <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-  <!-- Set Leaflet image path (necessary if your leaflet.js folder is in a different location) -->
+
   <style>
     #map {
       height: 400px;
@@ -32,31 +32,43 @@
 <script>
   var map = L.map('map').setView([51.505, -0.09], 13);
 
-  // Define the bounds of the static image
+
   var bounds = [[51.48, -0.12], [51.52, -0.06]];
+  
+//  // Adicinando marcador no clique 
+//   map.on("click", function(e){
+//         var mp = new L.Marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+//         alert(mp.getLatLng());
+//  });
 
-  // Load and display the static map image
-  L.imageOverlay('lmao.jpg', bounds).addTo(map);
 
-  // Create MarkerClusterGroup
+  L.imageOverlay('OIP.jpg', bounds).addTo(map);
+
   var markers = L.markerClusterGroup();
 
-  // Define marker data
+  
   var markerData = [
     {lat: 51.5, lng: -0.09, rating: 4},
     {lat: 51.51, lng: -0.1, rating: 3},
     {lat: 51.49, lng: -0.08, rating: 5}
-    // Add more marker data as needed
   ];
 
-  // Create markers and bind popups
   markerData.forEach(function(marker) {
     var newMarker = L.marker([marker.lat, marker.lng]);
     newMarker.bindPopup("<b>Place</b><br>Rating: " + marker.rating + "/5");
     markers.addLayer(newMarker);
   });
+  
+  var clusters = {};
+  for (var i = 1; i <= 5; i++) {
+    clusters[i] = L.markerClusterGroup();
+  }
 
-  // Add MarkerClusterGroup to the map
+  for (var key in clusters) {
+    if (clusters.hasOwnProperty(key)) {
+      map.addLayer(clusters[key]);
+    }
+  }
   map.addLayer(markers);
 </script>
 
