@@ -3,9 +3,6 @@
 @media only screen and (min-width: 375px) and (max-width: 600px) {
   body {
     background-color: #45a3fa;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
   }
 
   .wrap {
