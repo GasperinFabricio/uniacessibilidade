@@ -1,44 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Uniacessibilidade</title>
-    <!-- Include Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <!-- Include Leaflet JavaScript -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- Include Leaflet MarkerCluster CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"
-    />
-    <!-- Include Leaflet MarkerCluster JavaScript -->
-    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-    <!-- Set Leaflet image path (necessary if your leaflet.js folder is in a different location) -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    />
-    <link rel="stylesheet" type="text/css" href="styles.css" />
-    <style>
-      #map {
-        height: 400px;
-      }
-      .custom-cluster-icon {
-        background: rgba(255, 255, 255, 0.6);
-        border-radius: 50%;
-        border: 1px solid #ccc;
-        text-align: center;
-        font-size: 12px;
-      }
-    </style>
-  </head>
-  <body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uniacessibilidade</title>
+
+  <!-- Include Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- Include Leaflet JavaScript -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Include Leaflet MarkerCluster CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+
+  <!-- Include Leaflet MarkerCluster JavaScript -->
+  <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
+  <!-- Font Awesome for search icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+  <!-- Custom CSS -->
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      background-color: #333; /* Dark background */
+      color: #fff; /* White text */
+      font-family: Arial, sans-serif; /* Font family */
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #map {
+      flex: 1;
+      height: 400px; /* Adjust the height as needed */
+    }
+
+    .wrap {
+      background-color: #ff8c00; /* Orange background */
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      margin: 10px;
+      z-index: 1000;
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px; /* Add margin below the search bar */
+    }
+
+    .searchTerm {
+      width: 100%;
+      border: 1px solid #ff8c00; /* Orange border */
+      padding: 10px;
+      border-radius: 5px 0 0 5px;
+      font-size: 14px;
+      color: #333; /* Dark text */
+      background-color: #fff; /* White background */
+    }
+
+    .searchButton {
+      border: none;
+      background-color: #333; /* Dark background */
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 0 5px 5px 0;
+      color: #fff; /* White text */
+    }
+
+    .searchButton:hover {
+      background-color: #555; /* Darker background on hover */
+    }
+
+    .button-container {
+      text-align: center;
+      margin-bottom: 15px;
+      margin-top: 15px;
+    }
+
+    .button-container button {
+      background-color: #ff8c00; /* Orange background */
+      color: #fff; /* White text */
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      margin: 0 5px; /* Adjusted margin */
+      transition: background-color 0.3s ease;
+    }
+
+    .button-container button:first-child {
+      margin-left: 0; /* No margin on the left side of the first button */
+    }
+
+    .button-container button:last-child {
+      margin-right: 0; /* No margin on the right side of the last button */
+    }
+
+    .button-container button:hover {
+      background-color: #f76d00; /* Darker orange background on hover */
+    }
+
+    .custom-cluster-icon {
+      background: #ff8c00; /* Orange background */
+      color: #fff; /* White text */
+      border-radius: 50%;
+      border: 1px solid #333; /* Dark border */
+      text-align: center;
+      font-size: 12px;
+      line-height: 24px; /* Adjust according to your needs */
+      width: 24px; /* Adjust according to your needs */
+      height: 24px; /* Adjust according to your needs */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
     <div class="wrap">
       <div class="search">
         <input type="text" class="searchTerm" placeholder="Pra onde vamos?" />
@@ -50,75 +135,97 @@
 
     <div id="map"></div>
 
-    <script>
-      var map = L.map("map").setView([-22.89709, -43.10672], 13);
+    <div class="button-container">
+      <button id="adicionar" onClick="_adicionar()">Adicionar Marcador</button>
+      <button id="alterar" onClick="_alterar()">Editar Marcador</button>
+    </div>
+  </div>
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
+  <script>
+    var map = L.map("map").setView([-22.89709, -43.10672], 13);
 
-      // Initialize MarkerClusterGroup for clustering markers
-      var markers = L.markerClusterGroup({
-        // Customizing cluster icon to show average rating
-        iconCreateFunction: function (cluster) {
-          var childMarkers = cluster.getAllChildMarkers();
-          var totalRating = 0;
-          var totalVotes = 0;
-          for (var i = 0; i < childMarkers.length; i++) {
-            var votes = childMarkers[i].options.votes;
-            for (var j = 0; j < votes.length; j++) {
-              totalRating += votes[j];
-            }
-            totalVotes += votes.length;
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    var markers = L.markerClusterGroup({
+      iconCreateFunction: function (cluster) {
+        var childMarkers = cluster.getAllChildMarkers();
+        var totalRating = 0;
+        var totalVotes = 0;
+        for (var i = 0; i < childMarkers.length; i++) {
+          var votes = childMarkers[i].options.votes;
+          for (var j = 0; j < votes.length; j++) {
+            totalRating += votes[j].rating;
           }
-          var averageRating = totalRating / totalVotes;
-          var roundedAverage = averageRating.toFixed(1); // Round to one decimal place
-          return L.divIcon({
-            html:
-              '<div style="line-height: 1.6;">' +
-              roundedAverage +
-              "<br>Rating</div>",
-            className: "custom-cluster-icon",
-            iconSize: [40, 40],
-          });
-        },
-      });
-      map.addLayer(markers);
-
-      // Unique ID generator for markers
-      var markerId = 0;
-
-      // Function to add marker on map click with rating input
-      function addMarkerAndCluster(e) {
-        var rating = prompt("Enter rating (1-5):");
-        rating = parseInt(rating);
-
-        if (isNaN(rating) || rating < 1 || rating > 5) {
-          alert("Please enter a valid rating between 1 and 5.");
-          return;
+          totalVotes += votes.length;
         }
+        var averageRating = totalRating / totalVotes;
+        var roundedAverage = averageRating.toFixed(1);
+        return L.divIcon({
+          html:
+            '<div style="line-height: 1.6;">' +
+            roundedAverage +
+            "<br>Rating</div>",
+          className: "custom-cluster-icon",
+          iconSize: [40, 40],
+        });
+      },
+    });
+    map.addLayer(markers);
 
-        markerId++; // Increment marker ID for uniqueness
-        var newMarker = L.marker(e.latlng, { votes: [rating], id: markerId }); // Store ratings in an array
-        newMarker.bindPopup(
-          "<div id='popup' data-id='" +
-            markerId +
-            "'><b>Waypoint</b><br>Rating: " +
-            rating +
-            "/5<br><button onclick='addVote(this)'>Add Vote</button></div>"
-        );
-        markers.addLayer(newMarker);
+    var markerId = 0;
+    var context = 'add'; 
+
+    function _adicionar() {
+      context = 'add'; 
+    }
+
+    function _alterar() {
+      context = 'edit'; 
+    }
+
+    function onMapClick(e) {
+      if (context === 'add') {
+        addMarker(e);
+      }
+    }
+
+    map.on("click", onMapClick);
+
+    function addMarker(e) {
+      var rating = prompt("Enter rating (1-5):");
+      rating = parseInt(rating);
+
+      if (isNaN(rating) || rating < 1 || rating > 5) {
+        alert("Please enter a valid rating between 1 and 5.");
+        return;
       }
 
-      // Event listener for map click
-      map.on("click", addMarkerAndCluster);
+      var comment = prompt("Enter comment:");
 
-      // Function to add vote when user clicks 'Add Vote' button in the popup
-      function addVote(element) {
-        var markerId = parseInt(element.parentElement.getAttribute("data-id"));
-        var marker = getMarkerById(markerId);
-        var rating = prompt("Enter additional rating (1-5):");
+      markerId++;
+      var newMarker = L.marker(e.latlng, { votes: [{ rating: rating, comment: comment }], id: markerId });
+      var imgElement = '<img src="R.jpg" style="width: 100px; height: 100px;">';
+      newMarker.bindPopup(
+        "<div id='popup' data-id='" +
+          markerId +
+          "'><b>Waypoint</b><br>" +
+          imgElement +
+          "<br>Rating: " +
+          rating +
+          "/5<br>Comment: " +
+          comment +
+          "</div>"
+      );
+      markers.addLayer(newMarker);
+    }
+
+    map.on('popupopen', function (e) {
+      if (context === 'edit') {
+        var marker = e.popup._source;
+   
+        var rating = prompt("Enter updated rating (1-5):");
         rating = parseInt(rating);
 
         if (isNaN(rating) || rating < 1 || rating > 5) {
@@ -126,40 +233,43 @@
           return;
         }
 
-        marker.options.votes.push(rating);
+        var comment = prompt("Enter updated comment:");
+       
+        marker.options.votes = [{ rating: rating, comment: comment }];
         updatePopupContent(marker);
       }
+    });
 
-      // Function to get marker by ID
-      function getMarkerById(id) {
-        var marker;
-        markers.eachLayer(function (m) {
-          if (m.options.id === id) {
-            marker = m;
-          }
-        });
-        return marker;
-      }
+    function updatePopupContent(marker) {
+      var votes = marker.options.votes;
+      var totalRating = votes[0].rating; 
+      var commentsHtml = "<div><b>Rating:</b> " + votes[0].rating + "/5, <b>Comment:</b> " + votes[0].comment + "</div>";
+      var averageRating = totalRating;
+      marker
+        .getPopup()
+        .setContent(
+          "<div id='popup' data-id='" +
+            marker.options.id +
+            "'><b>Waypoint</b><br>" +
+            '<img src="R.jpg" style="width: 100px; height: 100px;">' + 
+            "<br>Rating: " +
+            averageRating.toFixed(1) +
+            "/5<br>Comments:<br>" +
+            commentsHtml +
+            "</div>"
+        );
+      marker.openPopup(); 
+    }
 
-      // Function to update popup content with current average rating
-      function updatePopupContent(marker) {
-        var votes = marker.options.votes;
-        var totalRating = 0;
-        for (var i = 0; i < votes.length; i++) {
-          totalRating += votes[i];
+    function getMarkerById(id) {
+      var marker;
+      markers.eachLayer(function (m) {
+        if (m.options.id === id) {
+          marker = m;
         }
-        var averageRating = totalRating / votes.length;
-        marker
-          .getPopup()
-          .setContent(
-            "<div id='popup' data-id='" +
-              marker.options.id +
-              "'><b>Waypoint</b><br>Rating: " +
-              averageRating.toFixed(1) +
-              "/5<br><button onclick='addVote(this)'>Add Vote</button></div>"
-          );
-        marker.openPopup(); // Reopen the popup to show the updated content
-      }
-    </script>
-  </body>
+      });
+      return marker;
+    }
+  </script>
+</body>
 </html>
